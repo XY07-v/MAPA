@@ -253,7 +253,7 @@ def buscar_punto():
     
     # Búsqueda por Regex flexible (No importa mayúsculas/minúsculas ni nombres exactos)
     if query_pdv:
-        filtro['Punto de Ver'] = {'$regex': query_pdv, '$options': 'i'}
+        filtro['Punro de venta'] = {'$regex': query_pdv, '$options': 'i'}
     if query_bmb:
         filtro['BMB'] = {'$regex': query_bmb, '$options': 'i'}
         
@@ -272,7 +272,7 @@ def buscar_punto():
 
     return jsonify({
         "status": "success",
-        "pdv": registro.get('Punto de Ver', 'N/A'),
+        "pdv": registro.get('Punro de venta', 'N/A'),
         "bmb": registro.get('BMB', 'N/A'),
         "ciudad": registro.get('Ciudad', 'N/A'),
         "lat": lat,
