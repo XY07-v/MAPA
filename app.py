@@ -86,7 +86,7 @@ HTML_LAYOUT = """
             bottom: 35px;
             right: 25px;
             z-index: 1000;
-            background: rgba(33, 37, 41, 0.9);
+            background: rgba(33, 37, 41, 0.95);
             color: white;
             padding: 15px;
             border-radius: 12px;
@@ -102,8 +102,8 @@ HTML_LAYOUT = """
 
 <div id="search-container">
     <h4>Buscador Inteligente</h4>
-    <input type="text" id="input-pdv" placeholder="Nombre del Punto de Venta (POC)...">
-    <input type="text" id="input-bmb" placeholder="Código BMB...">
+    <input type="text" id="input-pdv" placeholder="Escribe el nombre del Punto de Venta...">
+    <input type="text" id="input-bmb" placeholder="Escribe el código BMB...">
     <div id="search-buttons-layout">
         <button id="btn-buscar" class="btn-control" onclick="buscarPuntoEnBD()">Buscar</button>
         <button id="btn-restablecer" class="btn-control" onclick="restablecerMapa()">Ver Todos</button>
@@ -127,8 +127,8 @@ HTML_LAYOUT = """
     let marcadorUsuario = null;
     let marcadorDestino = null;
     let rutaPolilinea = null;
+    let circuloRadio = null;
 
-    // 1. Obtener Geolocalización del Dispositivo
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             miUbicacion = {
@@ -145,14 +145,13 @@ HTML_LAYOUT = """
                     popupAnchor: [1, -34],
                     shadowSize: [41, 41]
                 })
-            }).addTo(mapObject).bindPopup("<b>Tu ubicación real</b>").openPopup();
+            }).addTo(mapObject).bindPopup("<b>Tu ubicación real (Dispositivo)</b>").openPopup();
             
         }, function(error) {
-            console.error("Geolocalización denegada:", error.message);
+            console.error("Geolocalización denegada o inactiva:", error.message);
         });
     }
 
-    // Fórmula Haversine
     function calcularDistancia(lat1, lon1, lat2, lon2) {
         const R = 6371; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -160,24 +159,22 @@ HTML_LAYOUT = """
         const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                   Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return (R * c).toFixed(2);
+        return (R * c).toFixed(3);
     }
 
-    // 2. Buscar en el Backend de Flask e interactuar con MongoDB
     function buscarPuntoEnBD() {
-        const pdv = document.getElementById('input-pdv').value;
-        const bmb = document.getElementById('input-bmb').value;
+        const pdv = document.getElementById('input-pdv').value.trim();
+        const bmb = document.getElementById('input-bmb').value.trim();
 
         if (!pdv && !bmb) {
-            alert("Escribe un criterio de búsqueda.");
+            alert("Por favor escribe un Punto de Venta o código BMB.");
             return;
         }
 
-        // Limpiar elementos anteriores si existen
         if (marcadorDestino) { mapObject.removeLayer(marcadorDestino); }
         if (rutaPolilinea) { mapObject.removeLayer(rutaPolilinea); }
+        if (circuloRadio) { mapObject.removeLayer(circuloRadio); }
 
-        // Petición asíncrona a la API de Flask
         fetch(`/api/buscar?pdv=${encodeURIComponent(pdv)}&bmb=${encodeURIComponent(bmb)}`)
             .then(res => res.json())
             .then(data => {
@@ -189,22 +186,31 @@ HTML_LAYOUT = """
                 const destLat = data.lat;
                 const destLng = data.lng;
 
-                // Crear Marcador del Punto de Venta encontrado
                 marcadorDestino = L.marker([destLat, destLng]).addTo(mapObject);
                 
                 let contentHtml = `
-                    <b>Punto de Venta:</b> ${data.pdv}<br>
-                    <b>BMB:</b> ${data.bmb}<br>
-                    <b>Ciudad:</b> ${data.ciudad}
+                    <div style="font-family: Arial, sans-serif; font-size: 13px;">
+                        <b style="color: #007bff;">Punto de Venta:</b> ${data.pdv}<br>
+                        <b>BMB:</b> ${data.bmb}<br>
+                        <b>Ciudad:</b> ${data.ciudad}
+                    </div>
                 `;
                 marcadorDestino.bindPopup(contentHtml).openPopup();
 
-                // Trazar Línea Roja e Intersección limpia
+                // Radio de 150 metros
+                circuloRadio = L.circle([destLat, destLng], {
+                    color: '#007bff',
+                    fillColor: '#3388ff',
+                    fillOpacity: 0.2,
+                    radius: 150  
+                }).addTo(mapObject);
+
                 if (miUbicacion) {
                     const coordenadas = [
                         [miUbicacion.lat, miUbicacion.lng],
                         [destLat, destLng]
                     ];
+                    
                     rutaPolilinea = L.polyline(coordenadas, {
                         color: 'red',
                         weight: 4,
@@ -213,17 +219,27 @@ HTML_LAYOUT = """
                     }).addTo(mapObject);
 
                     const bounds = L.latLngBounds([miUbicacion, [destLat, destLng]]);
-                    mapObject.fitBounds(bounds, { padding: [50, 50] });
+                    mapObject.fitBounds(bounds, { padding: [60, 60] });
 
-                    // Mostrar Burbuja con distancia real calculada
-                    const km = calcularDistancia(miUbicacion.lat, miUbicacion.lng, destLat, destLng);
+                    const kmTotal = parseFloat(calcularDistancia(miUbicacion.lat, miUbicacion.lng, destLat, destLng));
+                    const metrosTotal = Math.round(kmTotal * 1000);
+                    
                     document.getElementById('info-burbuja').style.display = 'block';
-                    document.getElementById('distancia-texto').innerHTML = `<b>POC:</b> ${data.pdv}<br><b>Distancia:</b> <span style="color:#ff4d4d; font-weight:bold;">${km} km</span>`;
+                    document.getElementById('distancia-texto').innerHTML = `
+                        <b>POC:</b> ${data.pdv}<br>
+                        <b>Distancia aproximada:</b> <br>
+                        <span style="color:#ff4d4d; font-size:16px; font-weight:bold;">${kmTotal} km</span> (${metrosTotal} metros)
+                    `;
                 } else {
                     mapObject.setView([destLat, destLng], 16);
+                    document.getElementById('info-burbuja').style.display = 'block';
+                    document.getElementById('distancia-texto').innerHTML = `
+                        <b>POC:</b> ${data.pdv}<br>
+                        <span style="color:#ffc107;">Ubicación del dispositivo inactiva. No se calculó la métrica.</span>
+                    `;
                 }
             })
-            .catch(err => console.error("Error en Fetch:", err));
+            .catch(err => console.error("Error procesando solicitud:", err));
     }
 
     function restablecerMapa() {
@@ -232,6 +248,7 @@ HTML_LAYOUT = """
         document.getElementById('info-burbuja').style.display = 'none';
         if (marcadorDestino) { mapObject.removeLayer(marcadorDestino); }
         if (rutaPolilinea) { mapObject.removeLayer(rutaPolilinea); }
+        if (circuloRadio) { mapObject.removeLayer(circuloRadio); }
         mapObject.setView([4.60971, -74.08175], 12);
     }
 </script>
@@ -243,36 +260,38 @@ HTML_LAYOUT = """
 def home():
     return render_template_string(HTML_LAYOUT)
 
-# --- ENDPOINT API DE BÚSQUEDA ---
+# --- ENDPOINT API CORREGIDO PARA 'Punto de Venta' ---
 @app.route('/api/buscar')
 def buscar_punto():
     query_pdv = request.args.get('pdv', '').strip()
     query_bmb = request.args.get('bmb', '').strip()
     
+    if not query_pdv and not query_bmb:
+        return jsonify({"status": "error", "message": "Faltan parámetros de búsqueda."})
+        
     filtro = {}
     
-    # Búsqueda por Regex flexible (No importa mayúsculas/minúsculas ni nombres exactos)
+    # CORRECCIÓN AQUÍ: Cambiado 'Punto de Ver' a 'Punto de Venta' para alinearse con tu BD
     if query_pdv:
-        filtro['Punto de venta'] = {'$regex': query_pdv, '$options': 'i'}
+        filtro['Punto de Venta'] = {'$regex': query_pdv, '$options': 'i'}
     if query_bmb:
         filtro['BMB'] = {'$regex': query_bmb, '$options': 'i'}
         
     registro = puntos_col.find_one(filtro)
     
     if not registro:
-        return jsonify({"status": "error", "message": "Punto de venta no encontrado en la base de datos."})
+        return jsonify({"status": "error", "message": "No se encontró ningún punto con el criterio ingresado."})
     
     try:
-        # Tratamiento y parseo seguro del campo 'Ruta' (coordenadas)
         coordenadas = registro['Ruta'].split(',')
         lat = float(coordenadas[0].strip())
         lng = float(coordenadas[1].strip())
     except Exception:
-        return jsonify({"status": "error", "message": "El registro existe pero sus coordenadas en 'Ruta' son inválidas."})
+        return jsonify({"status": "error", "message": "El punto existe, pero su columna 'Ruta' no tiene coordenadas válidas."})
 
     return jsonify({
         "status": "success",
-        "pdv": registro.get('Punto de venta', 'N/A'),
+        "pdv": registro.get('Punto de Venta', 'Desconocido'),
         "bmb": registro.get('BMB', 'N/A'),
         "ciudad": registro.get('Ciudad', 'N/A'),
         "lat": lat,
@@ -280,5 +299,4 @@ def buscar_punto():
     })
 
 if __name__ == '__main__':
-    # Ejecución local controlada
     app.run(debug=True, port=5000)
