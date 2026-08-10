@@ -88,7 +88,7 @@
             gap: 1rem;
         }
 
-        /* Header Ajustado */
+        /* Header Ajustado con Firma */
         header {
             background: var(--glass-card);
             backdrop-filter: blur(20px) saturate(180%);
@@ -133,9 +133,19 @@
             margin: 0;
             font-size: 1.4rem;
             font-weight: 800;
+            line-height: 1.1;
             background: linear-gradient(90deg, var(--mp-blue-1), var(--mp-red));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .sub-author {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 2px;
+            letter-spacing: 0.2px;
         }
 
         .geo-badge {
@@ -169,7 +179,7 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(219, 137, 51, 0); }
         }
 
-        /* Filtros Responsivos (Grid flexible de 2 columnas en móviles sin desbordar) */
+        /* Filtros Responsivos */
         .filters-container {
             background: var(--glass-card);
             backdrop-filter: blur(20px);
@@ -216,7 +226,7 @@
             box-shadow: 0 0 0 2px rgba(92, 118, 189, 0.2);
         }
 
-        /* Tabla Ajustada al 100% Pantalla sin recortes */
+        /* Tabla Ajustada al 100% Pantalla */
         .table-card {
             background: var(--glass-card);
             backdrop-filter: blur(20px);
@@ -263,7 +273,7 @@
             text-align: center;
         }
 
-        /* Botón Mapa Compacto */
+        /* Botón Mapa */
         .btn-map {
             background: linear-gradient(135deg, var(--mp-blue-1), var(--mp-blue-2));
             color: white;
@@ -379,23 +389,6 @@
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        /* Pie de página */
-        footer {
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        footer span {
-            background: rgba(255,255,255,0.6);
-            padding: 0.3rem 1rem;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            display: inline-block;
-        }
-
         /* Responsividad Estricta Móvil */
         @media (max-width: 480px) {
             body { padding: 0.5rem; }
@@ -411,7 +404,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header con Identidad Manpower -->
+        <!-- Header con Identidad Manpower y Firma Reubicada -->
         <header>
             <div class="brand-zone">
                 <div class="mp-logo" title="ManpowerGroup">
@@ -423,7 +416,8 @@
                 </div>
                 <div>
                     <h1>Mapa nestle</h1>
-                    <small style="color: var(--text-muted); font-weight: 600;">
+                    <span class="sub-author">Desarrollado por Andres Vanegas BI</span>
+                    <small style="color: var(--text-muted); font-weight: 600; display: block; margin-top: 2px;">
                         Registros: <strong id="total-count" style="color: var(--mp-blue-1);">0</strong>
                     </small>
                 </div>
@@ -435,7 +429,7 @@
             </div>
         </header>
 
-        <!-- Filtros Dinámicos (Grid Perfecta) -->
+        <!-- Filtros Dinámicos -->
         <div class="filters-container">
             <div class="filter-box">
                 <label>ID</label>
@@ -476,11 +470,6 @@
                 <tbody id="table-body"></tbody>
             </table>
         </div>
-
-        <!-- Firma -->
-        <footer>
-            <span>Desarrollado por Andres Vanegas BI</span>
-        </footer>
     </div>
 
     <!-- Modal Mapa -->
@@ -645,9 +634,8 @@
 
                 const bounds = [];
 
-                L.marker([targetLat, targetLon]).addTo(mapInstance)
-                    .bindPopup(`<b>${row['Punto de Venta']}</b><br>Coordenada: ${targetLat}, ${targetLon}`)
-                    .openPopup();
+                // Marcador del Punto de Venta (SIN APERTURA AUTOMÁTICA DE POPUP)
+                L.marker([targetLat, targetLon]).addTo(mapInstance);
                 bounds.push([targetLat, targetLon]);
 
                 if (miLatitud !== null && miLongitud !== null) {
@@ -656,7 +644,7 @@
                         fillColor: '#7E9D89',
                         fillOpacity: 0.9,
                         radius: 8
-                    }).addTo(mapInstance).bindPopup("<b>Tu Posición Actual</b>");
+                    }).addTo(mapInstance);
 
                     bounds.push([miLatitud, miLongitud]);
 
