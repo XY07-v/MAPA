@@ -14,7 +14,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* Paleta Oficial ManpowerGroup */
+        /* Paleta ManpowerGroup */
         :root {
             --mp-blue-1: #42589E;
             --mp-blue-2: #5C76BD;
@@ -22,181 +22,189 @@
             --mp-red: #A24357;
             --mp-orange: #DB8933;
 
-            --glass-card: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.75);
-            --glass-shadow: 0 16px 40px rgba(31, 38, 135, 0.08);
+            --glass-card: rgba(255, 255, 255, 0.70);
+            --glass-border: rgba(255, 255, 255, 0.85);
+            --glass-shadow: 0 12px 32px rgba(31, 38, 135, 0.08);
             --text-dark: #1E293B;
             --text-muted: #64748B;
         }
 
         * {
             box-sizing: border-box;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease-in-out;
+        }
+
+        html {
+            /* Zoom al 90% */
+            zoom: 0.90;
+            -moz-transform: scale(0.90);
+            -moz-transform-origin: 0 0;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-dark);
             margin: 0;
-            padding: clamp(0.8rem, 2vw, 1.8rem);
+            padding: 0.8rem;
             min-height: 100vh;
             background: linear-gradient(135deg, #eef2f7 0%, #dce4f0 40%, #e2e8f0 100%);
             background-attachment: fixed;
             overflow-x: hidden;
-            position: relative;
+            width: 100%;
         }
 
-        /* Esferas Flotantes de Fondo (Animadas) */
+        /* Esferas decorativas */
         body::before, body::after {
             content: '';
             position: fixed;
             border-radius: 50%;
-            filter: blur(100px);
+            filter: blur(80px);
             z-index: -1;
-            opacity: 0.55;
+            opacity: 0.5;
             animation: float 12s ease-in-out infinite alternate;
         }
         body::before {
-            width: clamp(250px, 40vw, 500px);
-            height: clamp(250px, 40vw, 500px);
+            width: 300px; height: 300px;
             background: var(--mp-blue-2);
-            top: -10%; left: -10%;
+            top: -5%; left: -5%;
         }
         body::after {
-            width: clamp(280px, 45vw, 550px);
-            height: clamp(280px, 45vw, 550px);
+            width: 320px; height: 320px;
             background: var(--mp-orange);
-            bottom: -15%; right: -10%;
-            animation-delay: -6s;
+            bottom: -5%; right: -5%;
         }
 
         @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 40px) scale(1.08); }
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 25px); }
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 1.2rem;
-            animation: fadeInUp 0.6s ease-out;
+            gap: 1rem;
         }
 
-        /* Header Liquid Glass */
+        /* Header Ajustado */
         header {
             background: var(--glass-card);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: clamp(1rem, 2vw, 1.4rem) clamp(1.2rem, 3vw, 2rem);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
             box-shadow: var(--glass-shadow);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.8rem;
+            width: 100%;
         }
 
         .brand-zone {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
 
-        /* Logo Manpower Animado */
         .mp-logo {
             display: flex;
             align-items: center;
-            gap: 4px;
-            height: 38px;
+            gap: 3px;
+            height: 32px;
         }
         .mp-bar {
-            width: clamp(7px, 1.2vw, 9px);
-            height: 36px;
-            border-radius: 10px;
+            width: 7px;
+            height: 30px;
+            border-radius: 8px;
             transform: skewX(-18deg);
         }
         .bar-1 { background: var(--mp-blue-1); }
         .bar-2 { background: var(--mp-blue-2); }
         .bar-3 { background: var(--mp-green); }
-        .bar-4 { background: var(--mp-red); height: 42px; }
-        .bar-5 { background: var(--mp-orange); height: 32px; }
+        .bar-4 { background: var(--mp-red); height: 36px; }
+        .bar-5 { background: var(--mp-orange); height: 28px; }
 
         h1 {
             margin: 0;
-            font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+            font-size: 1.4rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
             background: linear-gradient(90deg, var(--mp-blue-1), var(--mp-red));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .geo-badge {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.8);
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            padding: 0.6rem 1.2rem;
-            border-radius: 16px;
-            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 14px;
+            font-size: 0.8rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            max-width: 100%;
+            word-break: break-word;
         }
 
         .geo-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--mp-orange);
             animation: pulse 1.8s infinite;
+            flex-shrink: 0;
         }
 
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(219, 137, 51, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(219, 137, 51, 0); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(219, 137, 51, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(219, 137, 51, 0); }
         }
 
-        /* Filtros Responsivos */
+        /* Filtros Responsivos (Grid flexible de 2 columnas en móviles sin desbordar) */
         .filters-container {
             background: var(--glass-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.2rem;
+            border-radius: 18px;
+            padding: 1rem;
             box-shadow: var(--glass-shadow);
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.6rem;
+            width: 100%;
         }
 
         .filter-box {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.2rem;
+            width: 100%;
         }
 
         .filter-box label {
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.65rem;
+            font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .filter-box input {
-            background: rgba(255, 255, 255, 0.85);
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(226, 232, 240, 0.9);
-            padding: 0.6rem 0.8rem;
-            border-radius: 12px;
-            font-size: 0.85rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
             outline: none;
             color: var(--text-dark);
             font-family: inherit;
@@ -205,136 +213,108 @@
         .filter-box input:focus {
             border-color: var(--mp-blue-2);
             background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(92, 118, 189, 0.25);
-            transform: translateY(-1px);
+            box-shadow: 0 0 0 2px rgba(92, 118, 189, 0.2);
         }
 
-        /* Tabla Completa Desplegada (Sin Scroll Interno) */
+        /* Tabla Ajustada al 100% Pantalla sin recortes */
         .table-card {
             background: var(--glass-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: clamp(0.8rem, 2vw, 1.4rem);
+            border-radius: 20px;
+            padding: 0.8rem;
             box-shadow: var(--glass-shadow);
             width: 100%;
+            overflow: hidden;
         }
 
         table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            font-size: clamp(0.82rem, 1.2vw, 0.92rem);
+            font-size: 0.8rem;
+            table-layout: auto;
         }
 
         th {
-            background: rgba(241, 245, 249, 0.7);
-            padding: 1rem;
+            background: rgba(241, 245, 249, 0.8);
+            padding: 0.7rem 0.5rem;
             text-align: left;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 0.5px;
+            font-size: 0.68rem;
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; width: 140px; }
-        th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        th:nth-child(1) { width: 95px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:nth-child(2) { border-top-left-radius: 0; }
+        th:nth-child(3) { width: 85px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; text-align: center; }
 
         td {
-            padding: 0.85rem 1rem;
+            padding: 0.65rem 0.4rem;
             border-bottom: 1px solid rgba(226, 232, 240, 0.5);
             vertical-align: middle;
+            word-break: break-word;
         }
 
-        tbody tr {
-            animation: fadeInUp 0.4s ease-out;
+        td:nth-child(3) {
+            text-align: center;
         }
 
-        tbody tr:hover td {
-            background: rgba(255, 255, 255, 0.65);
-        }
-
-        /* Botón de Mapa Interactivo con Animación */
+        /* Botón Mapa Compacto */
         .btn-map {
             background: linear-gradient(135deg, var(--mp-blue-1), var(--mp-blue-2));
             color: white;
             border: none;
-            padding: 0.55rem 1rem;
-            border-radius: 12px;
+            padding: 0.45rem 0.6rem;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 12px rgba(66, 88, 158, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-map i {
-            transition: transform 0.3s ease;
+            gap: 0.3rem;
+            white-space: nowrap;
+            box-shadow: 0 3px 8px rgba(66, 88, 158, 0.2);
         }
 
         .btn-map:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(66, 88, 158, 0.38);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(66, 88, 158, 0.3);
         }
 
-        .btn-map:hover i {
-            transform: rotate(15deg) scale(1.15);
-        }
-
-        .btn-map:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        /* Modal Glassmorphic Animado */
+        /* Modal Glassmorphic */
         .modal-backdrop {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 99999;
-            padding: clamp(0.8rem, 3vw, 1.5rem);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-backdrop.show {
-            display: flex;
-            opacity: 1;
+            padding: 0.8rem;
         }
 
         .modal-glass {
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 28px;
+            border-radius: 22px;
             width: 100%;
-            max-width: 900px;
+            max-width: 800px;
             overflow: hidden;
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-direction: column;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .modal-backdrop.show .modal-glass {
-            transform: scale(1);
         }
 
         .modal-header {
-            padding: 1.2rem 1.8rem;
+            padding: 1rem 1.2rem;
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
             display: flex;
             justify-content: space-between;
@@ -343,7 +323,7 @@
 
         .modal-header h3 {
             margin: 0;
-            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            font-size: 1rem;
             font-weight: 700;
             color: var(--mp-blue-1);
         }
@@ -351,41 +331,35 @@
         .modal-close {
             background: rgba(0,0,0,0.05);
             border: none;
-            width: 36px; height: 36px;
+            width: 30px; height: 30px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .modal-close:hover {
-            background: rgba(162, 67, 87, 0.15);
-            color: var(--mp-red);
-            transform: rotate(90deg);
-        }
-
         .modal-body {
-            padding: clamp(1rem, 2vw, 1.5rem);
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 1.2rem;
+            gap: 1rem;
         }
 
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.6rem;
             background: rgba(255,255,255,0.7);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            padding: 1rem 1.2rem;
-            border-radius: 18px;
+            padding: 0.8rem;
+            border-radius: 14px;
         }
 
         .detail-item font {
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -393,49 +367,45 @@
         }
 
         .detail-item span {
-            font-size: 0.88rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-dark);
         }
 
         #map {
-            height: clamp(280px, 45vh, 440px);
+            height: 350px;
             width: 100%;
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
-        /* Keyframes de entrada */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Pie de página */
         footer {
             text-align: center;
-            padding: 0.8rem;
-            font-size: 0.82rem;
+            padding: 0.5rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--text-muted);
         }
 
         footer span {
             background: rgba(255,255,255,0.6);
-            padding: 0.4rem 1.2rem;
-            border-radius: 20px;
+            padding: 0.3rem 1rem;
+            border-radius: 16px;
             border: 1px solid var(--glass-border);
             display: inline-block;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
 
-        /* Ajustes Responsivos Móviles */
-        @media (max-width: 640px) {
-            header { flex-direction: column; align-items: flex-start; }
-            .geo-badge { width: 100%; justify-content: center; }
-            .filters-container { grid-template-columns: repeat(2, 1fr); }
-            th, td { padding: 0.7rem 0.5rem; }
-            .btn-map { padding: 0.45rem 0.75rem; font-size: 0.75rem; }
+        /* Responsividad Estricta Móvil */
+        @media (max-width: 480px) {
+            body { padding: 0.5rem; }
+            header { flex-direction: column; align-items: stretch; text-align: center; }
+            .brand-zone { justify-content: center; }
+            .geo-badge { justify-content: center; font-size: 0.75rem; }
+            .filters-container { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            th, td { padding: 0.5rem 0.3rem; font-size: 0.75rem; }
+            th:nth-child(1) { width: 80px; }
+            .btn-map { padding: 0.35rem 0.45rem; font-size: 0.68rem; }
         }
     </style>
 </head>
@@ -465,18 +435,18 @@
             </div>
         </header>
 
-        <!-- Filtros Dinámicos (Sin Filtro Coordenadas) -->
+        <!-- Filtros Dinámicos (Grid Perfecta) -->
         <div class="filters-container">
             <div class="filter-box">
                 <label>ID</label>
                 <input type="text" id="flt-Id" oninput="filtrarTabla()" placeholder="Buscar ID...">
             </div>
             <div class="filter-box">
-                <label>Punto de Venta</label>
+                <label>Poder / Punto</label>
                 <input type="text" id="flt-Punto de Venta" oninput="filtrarTabla()" placeholder="Buscar Punto...">
             </div>
             <div class="filter-box">
-                <label>Departamento</label>
+                <label>Depto</label>
                 <input type="text" id="flt-Departamento" oninput="filtrarTabla()" placeholder="Buscar Depto...">
             </div>
             <div class="filter-box">
@@ -493,7 +463,7 @@
             </div>
         </div>
 
-        <!-- Tabla Únicamente con Acción, Punto de Venta y BMB -->
+        <!-- Tabla Completa Encajada al 100% -->
         <div class="table-card">
             <table>
                 <thead>
@@ -507,13 +477,13 @@
             </table>
         </div>
 
-        <!-- Pie de página con Firma -->
+        <!-- Firma -->
         <footer>
             <span>Desarrollado por Andres Vanegas BI</span>
         </footer>
     </div>
 
-    <!-- Modal Mapa y Detalle Completo -->
+    <!-- Modal Mapa -->
     <div class="modal-backdrop" id="mapModal">
         <div class="modal-glass">
             <div class="modal-header">
@@ -568,7 +538,7 @@
                     status.innerHTML = `GPS Activo: <b>${miLatitud.toFixed(4)}, ${miLongitud.toFixed(4)}</b>`;
                 },
                 (err) => {
-                    status.textContent = "GPS no autorizado o inactivo";
+                    status.textContent = "GPS inactivo o sin permiso";
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
@@ -601,9 +571,8 @@
             tbody.innerHTML = '';
             document.getElementById('total-count').textContent = datos.length;
 
-            datos.forEach((row, index) => {
+            datos.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.style.animationDelay = `${Math.min(index * 0.03, 0.3)}s`;
 
                 // Columna 1: Botón Mapa
                 const tdMapa = document.createElement('td');
@@ -657,7 +626,7 @@
                 <div class="detail-item"><font>Diferencia GPS</font><span style="color: var(--mp-red); font-weight:800;">${distTexto}</span></div>
             `;
 
-            modal.classList.add('show');
+            modal.style.display = 'flex';
 
             setTimeout(() => {
                 if (mapInstance !== null) mapInstance.remove();
@@ -676,13 +645,11 @@
 
                 const bounds = [];
 
-                // Marcador del Punto de Venta
                 L.marker([targetLat, targetLon]).addTo(mapInstance)
                     .bindPopup(`<b>${row['Punto de Venta']}</b><br>Coordenada: ${targetLat}, ${targetLon}`)
                     .openPopup();
                 bounds.push([targetLat, targetLon]);
 
-                // Marcador GPS Actual y Línea Trazo
                 if (miLatitud !== null && miLongitud !== null) {
                     L.circleMarker([miLatitud, miLongitud], {
                         color: '#7E9D89',
@@ -700,24 +667,15 @@
                         dashArray: '6, 8'
                     }).addTo(mapInstance);
 
-                    mapInstance.fitBounds(bounds, { padding: [40, 40] });
+                    mapInstance.fitBounds(bounds, { padding: [30, 30] });
                 }
 
                 mapInstance.invalidateSize();
-            }, 250);
+            }, 200);
         }
 
         function cerrarModal() {
-            const modal = document.getElementById('mapModal');
-            modal.classList.remove('show');
-        }
-
-        // Cerrar modal al hacer clic fuera del vidrio
-        window.onclick = function(e) {
-            const modal = document.getElementById('mapModal');
-            if (e.target === modal) {
-                cerrarModal();
-            }
+            document.getElementById('mapModal').style.display = 'none';
         }
     </script>
 </body>
